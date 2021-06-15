@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
-import MMKVStorage, { useMMKVStorage, create } from "react-native-mmkv-storage";
+import MMKVStorage, { useMMKVStorage } from 'react-native-mmkv-storage';
 
 
 const MMKV = new MMKVStorage.Loader().initialize();
-create(MMKV)
 export const useStorage = (key: string) => {
+  // @ts-ignore
   return useMMKVStorage(key, MMKV);
 };
 
 export default function App() {
-  const [user, setUser] = useStorage("user");
-  const [text, onChangeText] = useState<string>("");
+  const [categories, setCategories] = useStorage('categories');
+  const [text, onChangeText] = useState<string>('');
+  useEffect(() => {
+    if (!categories) setCategories(['hello'])
+  })
   return (
     <View style={styles.container}>
-      <Text>{user}</Text>
+      <Text>{(categories || []).join()}</Text>
       <TextInput
         value={text}
         onChangeText={onChangeText}
         placeholder="enter text"
       />
-      <Button onPress={() => {setUser(text)}} title="update"/>
+      <Button
+        onPress={() => {setCategories((categories || []).concat(text))}}
+        title="update"
+      />
     </View>
   );
 }
